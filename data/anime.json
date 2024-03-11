@@ -1,0 +1,187 @@
+[
+  {
+    "imdbId": "tt2560140",
+    "title": "Attack on Titan",
+    "releaseDate": "2013-09-28",
+    "trailer": "https://www.youtube.com/watch?v=MGRm4IzK1SQ",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Drama",
+      "Fantasy",
+      "Horror"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/hTP1DtLGFamjfu8WqjnuQdP1n4i.jpg",
+    "backdrops": [
+      "https://image.tmdb.org/t/p/original/iM0ZnpWE0pzZdNh2dDF5f0O6jK1.jpg",
+      "https://image.tmdb.org/t/p/original/8X8n0BjKvA5oENyns3oP1QVNx5Z.jpg",
+      "https://image.tmdb.org/t/p/original/2euk86Y2huYGUHuuAAczyLydNWE.jpg",
+      "https://image.tmdb.org/t/p/original/hv3Amu4bUxcR2BsJBJW5QygwMY4.jpg",
+      "https://image.tmdb.org/t/p/original/5qFlHCtb82MWuMf72NgXltjnq96.jpg",
+      "https://image.tmdb.org/t/p/original/iks5oKiauKagoCatBRDMqyb0xPH.jpg",
+      "https://image.tmdb.org/t/p/original/buM8TPzItYxqtK8mbGF4iV66RRf.jpg"
+    ],
+    "reviewIds": []
+  },
+  {
+    "imdbId": "tt12343534",
+    "title": "Jujutsu Kaisen",
+    "releaseDate": "2020-10-02",
+    "trailer": "https://www.youtube.com/watch?v=pkKu9hLT-t8",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Thriller"
+    ],
+    "poster": "https://image.tmdb.org/t/p/w600_and_h900_bestv2/fHpKWq9ayzSk8nSwqRuaAUemRKh.jpg",
+    "backdrops": [
+      "https://image.tmdb.org/t/p/original/3wymoL9HYpllpFrcD8VCvemktGg.jpg",
+      "https://image.tmdb.org/t/p/original/veG3J8KaBudM8omuGi58fYOMDTz.jpg",
+      "https://image.tmdb.org/t/p/original/tRXGvZGWcGYAIXG66CRvSkfeUPn.jpg",
+      "https://image.tmdb.org/t/p/original/qUvueZ53J9AeildtX5zHdsWHjrl.jpg",
+      "https://image.tmdb.org/t/p/original/p7iB7X4BBr1vxeIjfeIelKZWaeS.jpg",
+      "https://image.tmdb.org/t/p/original/groVCaZRxVjDH4f3xiSnSH74DTu.jpg",
+      "https://image.tmdb.org/t/p/original/yP4ZiaEm9zctkMZoIGkUEHcqYEU.jpg"
+    ],
+    "reviewIds": []
+  },
+  {
+    "imdbId": "tt9335498",
+    "title": "Demon Slayer: Kimetsu no Yaiba",
+    "releaseDate": "2019-04-06",
+    "trailer": "https://www.youtube.com/watch?v=t6MXHczeEqc",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy",
+      "Thriller"
+    ],
+    "poster": "https://image.tmdb.org/t/p/original/xUfRZu2mi8jH6SzQEJGP6tjBuYj.jpg",
+    "backdrops": [
+      "https://image.tmdb.org/t/p/original/iBAtBLqCMON3NPIjyQ1wdMbpTAk.jpg",
+      "https://image.tmdb.org/t/p/original/adAURIlyNNqqXgC5P1KWliHCZpS.jpg",
+      "https://image.tmdb.org/t/p/original/4GeXmmkzRBduK2KXMGMrLlKYg44.jpg",
+      "https://image.tmdb.org/t/p/original/thAqQJ2HideEdt1y3V0Mip9gobr.jpg",
+      "https://image.tmdb.org/t/p/original/gdlEXQbUuVtIzKxuOMWd2BhT4n8.jpg",
+      "https://image.tmdb.org/t/p/original/qpB2Ta26lsKViWRVhuozVnJHmEr.jpg",
+      "https://image.tmdb.org/t/p/original/qe1Dfr5XM7ybR0kGjElgISJO9fZ.jpg"
+    ],
+    "reviewIds": []
+  },
+  {
+    "imdbId": "tt0434665",
+    "title": "Bleach",
+    "releaseDate": "2004-10-05",
+    "trailer": "https://www.youtube.com/watch?v=mnFXQUq-7ks",
+    "genres": [
+      "Action",
+      "Adventure",
+      "Fantasy"
+    ],
+    "poster": "https://image.tmdb.org/t/p/original/6KtJsPqbLVcbJ3aOTMORpSISO9G.jpg",
+    "backdrops": [
+      "https://image.tmdb.org/t/p/original/qtfMr08KQsWXnCHY0a96N8NpQ2l.jpg",
+      "https://image.tmdb.org/t/p/original/nYBcCVuxn9U7tJNkafKdCm60DEs.jpg",
+      "https://image.tmdb.org/t/p/original/xJKDq3R8mP1NU9DrzBjaVOjazNO.jpg",
+      "https://image.tmdb.org/t/p/original/emjUAgBPFUceiLOZzmqh7wDwF9h.jpg",
+      "https://image.tmdb.org/t/p/original/iOV8fyGVkkGanMAloQRRBAwVcez.jpg",
+      "https://image.tmdb.org/t/p/original/cZcvZSALnoScFKKr1RilWD430FY.jpg",
+      "https://image.tmdb.org/t/p/original/m8pWAmhgyND3IwhrwgZguAALaTB.jpg"
+    ],
+    "reviewIds": []
+  },
+  {
+    "imdbId": "tt1355642",
+    "title": "Fullmetal Alchemist: Brotherhood",
+    "releaseDate": "2009-04-05",
+    "trailer": "https://www.youtube.com/watch?v=JaV7mmc9HGw",
+    "genres": [
+      "Action",
+      "Sci-Fi",
+      "Adventure",
+      "Comedy",
+      "Drama"
+    ],
+    "poster": "https://image.tmdb.org/t/p/original/f4UHboEnMRHPvZp0Ny9BZDLyQ8v.jpg",
+    "backdrops": [
+      "https://image.tmdb.org/t/p/original/nZnuibf83RP6IN7NXAmk41vuw83.jpg",
+      "https://image.tmdb.org/t/p/original/kBB5cuAO3LUxRPFkbDjF153drBY.jpg",
+      "https://image.tmdb.org/t/p/original/322Q0gSbUVcM4rCiukG96Kr64Xa.jpg",
+      "https://image.tmdb.org/t/p/original/ysWwu8SUbRR6pvRlfuPmrTExt5G.jpg",
+      "https://image.tmdb.org/t/p/original/4mkeO7vmlWQSyPF7YcFGcnNzYvP.jpg",
+      "https://image.tmdb.org/t/p/original/4yts0wsG5XLfPRx1IBtslBNwVpP.jpg",
+      "https://image.tmdb.org/t/p/original/sFc4zxin9mGkNMTQfukyi4JLeEZ.jpg"
+    ],
+    "reviewIds": []
+  },
+  {
+    "imdbId": "tt13616990",
+    "title": "Chainsaw Man",
+    "releaseDate": "2022-10-12",
+    "trailer": "https://www.youtube.com/watch?v=l96zmDlWCBk",
+    "genres": [
+      "Fantasy",
+      "Action",
+      "Thriller",
+      "Adventure"
+    ],
+    "poster": "https://image.tmdb.org/t/p/original/npdB6eFzizki0WaZ1OvKcJrWe97.jpg",
+    "backdrops": [
+      "https://image.tmdb.org/t/p/original/dDwTq0HNQGMCpEdVQQyksvJvUcP.jpg",
+      "https://image.tmdb.org/t/p/original/tJ946hTDv4vwf51dYD6cK8pxC8o.jpg",
+      "https://image.tmdb.org/t/p/original/vYffuM8kRomHhZ9Yjx4zEP5M013.jpg",
+      "https://image.tmdb.org/t/p/original/cr06mNDDsQMA86b9RuiSdhrPkTU.jpg",
+      "https://image.tmdb.org/t/p/original/A852j8HhjwYuhPaTQide8Upybq2.jpg",
+      "https://image.tmdb.org/t/p/original/xT2COgjUXnnC5ho4El1epWFkwjt.jpg",
+      "https://image.tmdb.org/t/p/original/f24lnfvDoHZUqhTvn7DKyKSctrf.jpg"
+    ],
+    "reviewIds": []
+  },
+  {
+    "imdbId": "tt4508902",
+    "title": "One Punch Man",
+    "releaseDate": "2015-10-05",
+    "trailer": "https://www.youtube.com/watch?v=X4e3oZaPtaE",
+    "genres": [
+      "Action",
+      "Fantasy",
+      "Family",
+      "Comedy",
+      "Sci-Fi"
+    ],
+    "poster": "https://image.tmdb.org/t/p/original/iE3s0lG5QVdEHOEZnoAxjmMtvne.jpg",
+    "backdrops": [
+      "https://image.tmdb.org/t/p/original/3x7GZI2QCc0I7I2yGjV2iL1KDAg.jpg",
+      "https://image.tmdb.org/t/p/original/aplXpE6aHBpY5SUO2aP7AnTZuhL.jpg",
+      "https://image.tmdb.org/t/p/original/ygjjhKcImW9C67tYSFVjtGkOiIp.jpg",
+      "https://image.tmdb.org/t/p/original/d5h1EgV1xIjlioPnb0exwLYy1ev.jpg",
+      "https://image.tmdb.org/t/p/original/cndsNTszFoNEOygRIRdvRX85JDP.jpg",
+      "https://image.tmdb.org/t/p/original/pygrhuxLyYgT54SKrcOVFf7sPUd.jpg",
+      "https://image.tmdb.org/t/p/original/7t9WUHdEw3qB2Ug8HkxT4n8tSPz.jpg"
+    ],
+    "reviewIds": []
+  },
+  {
+    "imdbId": "tt5311514",
+    "title": "Your Name.",
+    "releaseDate": "2016-08-26",
+    "trailer": "https://www.youtube.com/watch?v=27q1kdb3sNY",
+    "genres": [
+      "Drama",
+      "Fantasy",
+      "Romance"
+    ],
+    "poster": "https://image.tmdb.org/t/p/original/8GJsy7w7frGquw1cy9jasOGNNI1.jpg",
+    "backdrops": [
+      "https://image.tmdb.org/t/p/original/dIWwZW7dJJtqC6CgWzYkNVKIUm8.jpg",
+      "https://image.tmdb.org/t/p/original/rjs5IfIv6Psl2YCSHKcluhTQGjJ.jpg",
+      "https://image.tmdb.org/t/p/original/wJXwawr9aXEnN1MeQcd2kyETRKF.jpg",
+      "https://image.tmdb.org/t/p/original/de6skzU80j6GivJGTLC1cCZKaUB.jpg",
+      "https://image.tmdb.org/t/p/original/v0XBOedgXqSzOsqpD9ViZYYcI7v.jpg",
+      "https://image.tmdb.org/t/p/original/7jiy8ww4d28YYW1UZIj1LMUjz8H.jpg",
+      "https://image.tmdb.org/t/p/original/yZiEkjAXreIQVykDcqa7E1LaRvo.jpg"
+    ],
+    "reviewIds": []
+  }
+]
