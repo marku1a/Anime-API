@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@CrossOrigin(origins = "http://localhost:3000", methods = {RequestMethod.GET, RequestMethod.POST})
+@CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
@@ -22,16 +22,22 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
-            @RequestBody RegisterRequest request)
-    {
-        return ResponseEntity.ok(authService.register(request));
+            @RequestBody RegisterRequest request,
+            HttpServletResponse response) throws IOException {
+        AuthenticationResponse authResponse = authService.register(request);
+        authService.setTokenAsCookie(response, authResponse.getAccessToken());
+        return ResponseEntity.ok(authResponse);
     }
+
     @PostMapping("/authenticate")
     public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request)
-    {
-        return ResponseEntity.ok(authService.authenticate(request));
+            @RequestBody AuthenticationRequest request,
+            HttpServletResponse response) throws IOException {
+        AuthenticationResponse authResponse = authService.authenticate(request);
+        authService.setTokenAsCookie(response, authResponse.getAccessToken());
+        return ResponseEntity.ok(authResponse);
     }
+
     @PostMapping("/refresh-token")
     public void refreshToken(
             HttpServletRequest request,
@@ -39,4 +45,6 @@ public class AuthenticationController {
     ) throws IOException {
         authService.refreshToken(request, response);
     }
+    
+
 }

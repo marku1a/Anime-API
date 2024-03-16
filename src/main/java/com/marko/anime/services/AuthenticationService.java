@@ -36,6 +36,7 @@ public class AuthenticationService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
+                .userId(request.getUserId())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(String.valueOf(Role.USER))
                 .build();
@@ -65,6 +66,7 @@ public class AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
+                .userId(user.getUserId())
                 .build();
     }
 
@@ -94,7 +96,7 @@ public class AuthenticationService {
         final String refreshToken;
         final String userEmail;
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
+            throw new IllegalArgumentException("Missing or invalid Authorization header");
         }
         refreshToken = authHeader.substring(7);
         userEmail = jwtService.extractUsername(refreshToken);
@@ -109,8 +111,17 @@ public class AuthenticationService {
                         .accessToken(accessToken)
                         .refreshToken(refreshToken)
                         .build();
+                setTokenAsCookie(response, accessToken);
+                setRTokenAsCookie(response, refreshToken);
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
         }
+    }
+
+    public void setTokenAsCookie(HttpServletResponse response, String token) {
+        response.setHeader(HttpHeaders.SET_COOKIE, "access_token=" + token + "; HttpOnly; Secure; SameSite=Strict");
+    }
+    public void setRTokenAsCookie(HttpServletResponse response, String token) {
+        response.setHeader(HttpHeaders.SET_COOKIE, "refresh_token=" + token + "; HttpOnly; Secure; SameSite=Strict");
     }
 }
