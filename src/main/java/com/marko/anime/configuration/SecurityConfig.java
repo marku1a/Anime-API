@@ -35,6 +35,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/v1/anime/**").permitAll()
                                 .requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers( "/api/v1/anime-reviews").authenticated()
+                                .requestMatchers( "/api/v1/anime-reviews/**").authenticated()
                                 .requestMatchers(GET, "/api/v1/demo-controller").authenticated()
                                 .anyRequest().authenticated()
                 )

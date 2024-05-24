@@ -22,12 +22,13 @@ public class JwtService {
 
     @Value("${jwt.secret-key}")
     private String secretKey;
-    private final long jwtExpiration = 3600000; //1hour
+    private final long jwtExpiration = 600000; //10min
     private final long refreshExpiration = 604800000; //1week
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -40,6 +41,7 @@ public class JwtService {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
     public String generateToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails
@@ -84,5 +86,8 @@ public class JwtService {
     private SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+    public long getRefreshExpiration() {
+        return refreshExpiration;
     }
 }

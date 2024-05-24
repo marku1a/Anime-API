@@ -9,6 +9,7 @@ import com.marko.anime.repositories.UserRepository;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,10 +28,8 @@ public class ReviewService {
 
     public Review giveReview(String body, String imdbId, String userId) throws Exception {
         Review review = new Review(body, userId);
-        Optional<User> userOpt = userRepository.findByUserId(userId);
-        if (userOpt.isEmpty()) {
-            throw new Exception("User does not exist.");
-        }
+        Optional<User> userOpt = Optional.ofNullable(userRepository.findByUserId(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found")));
         reviewRepository.insert(review);
         mongoTemplate.update(Anime.class).matching(Criteria.where("imdbId").is(imdbId))
                 .apply(new Update().push("reviewIds").value(review.getId()))

@@ -8,34 +8,45 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
     private final AuthenticationService authService;
 
+
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
+    public ResponseEntity<?> register(
             @RequestBody RegisterRequest request,
             HttpServletResponse response) throws IOException {
-        AuthenticationResponse authResponse = authService.register(request);
-        authService.setTokenAsCookie(response, authResponse.getAccessToken());
-        return ResponseEntity.ok(authResponse);
+        try {
+            AuthenticationResponse authResponse = authService.register(request);
+            authService.setRTokenAsCookie(response, authResponse.getRefreshToken());
+            return ResponseEntity.ok(authResponse);
+        } catch (Exception e) {
+            String errorMessage = "Registration failed: " + e.getMessage();
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
     }
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthenticationResponse> authenticate(
+    public ResponseEntity<?> authenticate(
             @RequestBody AuthenticationRequest request,
-            HttpServletResponse response) throws IOException {
-        AuthenticationResponse authResponse = authService.authenticate(request);
-        authService.setTokenAsCookie(response, authResponse.getAccessToken());
-        return ResponseEntity.ok(authResponse);
+            HttpServletResponse response) throws BadCredentialsException {
+        try {
+            AuthenticationResponse authResponse = authService.authenticate(request);
+            authService.setRTokenAsCookie(response, authResponse.getRefreshToken());
+            return ResponseEntity.ok(authResponse);
+        } catch (BadCredentialsException e) {
+            String errorMessage = "Login failed: Check your email and password and try again! ";
+            return ResponseEntity.badRequest().body(errorMessage);
+        }
     }
 
     @PostMapping("/refresh-token")
@@ -45,6 +56,6 @@ public class AuthenticationController {
     ) throws IOException {
         authService.refreshToken(request, response);
     }
-    
+
 
 }
