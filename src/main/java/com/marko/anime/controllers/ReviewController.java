@@ -8,6 +8,7 @@ import com.marko.anime.services.ReviewService;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,9 +31,15 @@ public class ReviewController {
         this.reviewRepository = reviewRepository;
     }
     @PostMapping
-    public ResponseEntity<Review> createReview(@RequestBody Map<String,String> payload) throws Exception {
-        return new ResponseEntity<Review>(reviewService
-                .giveReview(payload.get("reviewBody"), payload.get("imdbId"), payload.get("userId")), HttpStatus.CREATED);
+    public ResponseEntity<?> createReview(@RequestBody Map<String, String> payload) {
+        try {
+            Review review = reviewService.giveReview(payload.get("reviewBody"), payload.get("imdbId"), payload.get("userId"));
+            return new ResponseEntity<>(review, HttpStatus.CREATED);
+        } catch (UsernameNotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
    @GetMapping("/{imdbId}")
     public ResponseEntity<List<Review>> getAnimeReviews(@PathVariable String imdbId) {
@@ -49,7 +56,7 @@ public class ReviewController {
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
    }

@@ -29,6 +29,7 @@ public class User implements UserDetails {
     private String userId;//nickname
     private String password;
     private String role;
+    private boolean accountNonLocked;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -47,7 +48,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return accountNonLocked;
     }
 
     @Override

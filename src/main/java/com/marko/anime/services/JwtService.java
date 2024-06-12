@@ -2,7 +2,6 @@ package com.marko.anime.services;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,11 +59,11 @@ public class JwtService {
             long expiration
     ) {
         return Jwts.builder()
-                .setClaims(extraClaims)
+                .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
     }
     public String generateToken(UserDetails userDetails) {

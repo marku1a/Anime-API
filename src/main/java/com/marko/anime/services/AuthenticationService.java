@@ -57,7 +57,8 @@ public class AuthenticationService {
                     .email(request.getEmail().trim().toLowerCase())
                     .userId(request.getUserId().trim())
                     .password(passwordEncoder.encode(request.getPassword()))
-                    .role(String.valueOf(Role.USER))
+                    .role("ROLE_" + Role.USER)
+                    .accountNonLocked(true)
                     .build();
             var savedUser = userRepository.save(user);
             var jwtToken = jwtService.generateToken(user);
@@ -121,6 +122,9 @@ public class AuthenticationService {
 
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String refreshToken = extractRefreshToken(request);
+        if (refreshToken == null ){
+            return;
+        }
         final String userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
             if (!refreshTokenInProgress.add(userEmail)) {
@@ -143,7 +147,7 @@ public class AuthenticationService {
                     setRTokenAsCookie(response, refreshToken);
                     new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
                 } else {
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid refresh token");
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid refresh token");
                 }
             } finally {
                 refreshTokenInProgress.remove(userEmail);
@@ -171,7 +175,7 @@ public class AuthenticationService {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .sameSite("None")
+                .sameSite("Strict")
                 .maxAge(Duration.ofMillis(refreshExp))
                 .build();
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());

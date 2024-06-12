@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface AnimeRepository extends MongoRepository<Anime, ObjectId> {
     Optional<Anime> findAnimeByImdbId(String imdbId);
+    Optional<Anime> deleteAnimeByImdbId(String imdbId);
 }

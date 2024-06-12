@@ -17,4 +17,5 @@ public interface UserRepository extends MongoRepository<User, ObjectId> {
     @Query("{ 'userId' : { $regex: ?0, $options: 'i' } }")
     Optional<User> findByUserIdIgnoreCase(String userId);
 
+
 }

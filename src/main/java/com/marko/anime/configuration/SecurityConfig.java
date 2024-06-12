@@ -12,7 +12,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -31,12 +31,12 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         auth -> auth
-                                .requestMatchers("/api/v1/anime").permitAll()
-                                .requestMatchers("/api/v1/anime/**").permitAll()
-                                .requestMatchers("/api/v1/auth/**").permitAll()
-                                .requestMatchers( "/api/v1/anime-reviews").authenticated()
+                                .requestMatchers("/api/v1/anime", "/api/v1/auth/**").permitAll()
+                                .requestMatchers(GET,"/api/v1/anime/*").authenticated()
+                                .requestMatchers(POST, "/api/v1/anime/**").hasRole("ADMIN")
+                                .requestMatchers(DELETE, "/api/v1/anime/**").hasRole("ADMIN")
                                 .requestMatchers( "/api/v1/anime-reviews/**").authenticated()
-                                .requestMatchers(GET, "/api/v1/demo-controller").authenticated()
+                                .requestMatchers("/api/v1/users", "/api/v1/users/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
