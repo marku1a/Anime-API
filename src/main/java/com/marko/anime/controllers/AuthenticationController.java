@@ -28,7 +28,6 @@ public class AuthenticationController {
             HttpServletResponse response) throws IllegalArgumentException {
         try {
             AuthenticationResponse authResponse = authService.register(request);
-            authService.setRTokenAsCookie(response, authResponse.getRefreshToken());
             return ResponseEntity.ok(authResponse);
         } catch (IllegalArgumentException e) {
             String errorMessage = "Registration failed: " + e.getMessage();

@@ -29,15 +29,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        auth -> auth
-                                .requestMatchers("/api/v1/anime", "/api/v1/auth/**").permitAll()
-                                .requestMatchers(GET,"/api/v1/anime/*").authenticated()
-                                .requestMatchers(POST, "/api/v1/anime/**").hasRole("ADMIN")
-                                .requestMatchers(DELETE, "/api/v1/anime/**").hasRole("ADMIN")
-                                .requestMatchers( "/api/v1/anime-reviews/**").authenticated()
-                                .requestMatchers("/api/v1/users", "/api/v1/users/**").hasRole("ADMIN")
-                                .anyRequest().authenticated()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/anime", "/api/v1/auth/**").permitAll()
+                        .requestMatchers(GET,"/api/v1/anime/*").authenticated()
+                        .requestMatchers("/api/v1/anime/**").hasRole("ADMIN")
+                        .requestMatchers( "/api/v1/anime-reviews/**").authenticated()
+                        .requestMatchers("/api/v1/users", "/api/v1/users/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider)

@@ -18,6 +18,7 @@ public class AnimeService {
     public AnimeService(AnimeRepository animeRepository) {
         this.animeRepository = animeRepository;
     }
+
     public List<Anime> findAllAnime() {
         try {
             return animeRepository.findAll();

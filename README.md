@@ -18,12 +18,19 @@ This is backend for my [Bingeworthy.anime](https://github.com/marku1a/Bingeworth
 ## Getting Started
 To run the project locally, follow these steps:
 
-1. Ensure you have Java and MongoDB installed on your system.
+1. Ensure you have Java and MongoDB installed (or MongoDB Atlas)
 2. Clone this repository to your local machine.
 3. Configure MongoDB connection settings in `application.properties`
 (create .env file and put in required fields like in .env.example)
-4. Build the project using Maven: `mvn clean install`.
-5. Run the application: `java -jar target/anime-0.0.1-SNAPSHOT.jar`.
+4. Build the project using Maven: `mvn clean install`
+5. Fill the MongoDB Anime collection with Anime.json file from Data folder
+6. Run the application: `java -jar target/anime-0.0.1-SNAPSHOT.jar`
+
+Using Docker:
+1. Clone Anime-API and Bingeworthy.anime and put them in same folder
+2. Using CMD navigate to Anime-API folder - `cd path/to/your/Anime-API`
+3. Use Docker Compose to build the images and run the containers - `docker compose up`
+4. Don't forget to fill MongoDB Anime collection with Anime.json file from Data folder
 
 ## API Endpoints
 - **GET /api/v1/anime**: Retrieve all anime.

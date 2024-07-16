@@ -35,7 +35,9 @@ public class LogoutService implements LogoutHandler {
         var storedToken = tokenRepository.findByToken(jwt)
                 .orElse(null);
         if (storedToken != null) {
-            tokenRepository.delete(storedToken);
+            storedToken.setExpired(true);
+            storedToken.setRevoked(true);
+            tokenRepository.save(storedToken);
         }
         ResponseCookie cookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)

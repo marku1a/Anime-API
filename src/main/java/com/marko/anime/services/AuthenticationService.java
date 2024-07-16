@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,25 +62,20 @@ public class AuthenticationService {
                     .accountNonLocked(true)
                     .build();
             var savedUser = userRepository.save(user);
-            var jwtToken = jwtService.generateToken(user);
-            var refreshToken = jwtService.generateRefreshToken(user);
-            saveUserToken(savedUser, jwtToken);
             return AuthenticationResponse.builder()
-                    .accessToken(jwtToken)
-                    .refreshToken(refreshToken)
                     .build();
-
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
-                    )
-            );
             var user = userRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new UsernameNotFoundException("Email not found!"));
+            try {
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                );
+            } catch (BadCredentialsException e) {
+                throw new BadCredentialsException("Bad credentials!");
+            }
             var jwtToken = jwtService.generateToken(user);
             var refreshToken = jwtService.generateRefreshToken(user);
             revokeAllUserTokens(user);
@@ -123,6 +119,7 @@ public class AuthenticationService {
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String refreshToken = extractRefreshToken(request);
         if (refreshToken == null ){
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Refresh token not found");
             return;
         }
         final String userEmail = jwtService.extractUsername(refreshToken);
@@ -133,7 +130,7 @@ public class AuthenticationService {
             }
             try {
                 var user = this.userRepository.findByEmail(userEmail)
-                        .orElseThrow(() -> new RuntimeException("User not found"));
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
                 if (jwtService.isTokenValid(refreshToken, user)) {
                     var accessToken = jwtService.generateToken(user);
                     revokeAllUserTokens(user);
@@ -153,12 +150,12 @@ public class AuthenticationService {
                 refreshTokenInProgress.remove(userEmail);
             }
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "User email not found");
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "User email not found");
         }
     }
 
 
-    private String extractRefreshToken(HttpServletRequest request) {
+    String extractRefreshToken(HttpServletRequest request) {
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("refresh_token".equals(cookie.getName())) {

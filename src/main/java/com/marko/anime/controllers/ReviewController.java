@@ -5,7 +5,6 @@ import com.marko.anime.models.Review;
 import com.marko.anime.repositories.AnimeRepository;
 import com.marko.anime.repositories.ReviewRepository;
 import com.marko.anime.services.ReviewService;
-import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -46,12 +46,10 @@ public class ReviewController {
         try {
             Optional<Anime> animeOpt = animeRepository.findAnimeByImdbId(imdbId);
             if(animeOpt.isPresent()) {
-                List<ObjectId> reviewIds = animeOpt.get().getReviewIds().stream()
-                        .map(Review::getId)
-                        .toList();
-                List<Review> reviews = reviewIds.stream()
-                        .flatMap(id -> reviewRepository.getById(id).stream())
-                        .toList();
+                List<Review> reviews = animeOpt.get().getReviewIds().stream()
+                        .map(id -> reviewRepository.getById(id.getId()).orElse(null))
+                       .filter(Objects::nonNull)
+                       .toList();
                 return new ResponseEntity<>(reviews, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);

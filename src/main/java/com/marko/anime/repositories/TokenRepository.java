@@ -12,6 +12,7 @@ public interface TokenRepository extends MongoRepository<Token, ObjectId> {
 
     @Query(value = "{ 'user.id' : ?0, 'expired': ?1, 'revoked': ?2 }")
     List<Token> findAllValidTokenByUser(ObjectId userId, boolean expired, boolean revoked);
-
+    List<Token> findAllTokenByExpiredTrue();
+    void deleteByExpired(boolean expired);
     Optional<Token> findByToken(String token);
 }
