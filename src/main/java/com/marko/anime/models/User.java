@@ -26,7 +26,7 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
     private String email;
-    private String userId;//nickname
+    private String userId; //username on app -> "Welcome, userId!"
     private String password;
     private String role;
     private boolean accountNonLocked;

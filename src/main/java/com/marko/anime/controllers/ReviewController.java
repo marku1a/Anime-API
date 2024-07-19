@@ -1,5 +1,7 @@
 package com.marko.anime.controllers;
 
+import com.marko.anime.dtos.ReviewStatus;
+import com.marko.anime.dtos.ReviewSubmissionResult;
 import com.marko.anime.models.Anime;
 import com.marko.anime.models.Review;
 import com.marko.anime.repositories.AnimeRepository;
@@ -33,11 +35,17 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<?> createReview(@RequestBody Map<String, String> payload) {
         try {
-            Review review = reviewService.giveReview(payload.get("reviewBody"), payload.get("imdbId"), payload.get("userId"));
-            return new ResponseEntity<>(review, HttpStatus.CREATED);
+            ReviewSubmissionResult result = reviewService.submitReview(payload.get("reviewBody"), payload.get("imdbId"), payload.get("userId"));
+            if ((result.getStatus()).equals(ReviewStatus.APPROVED)) {
+                return new ResponseEntity<>("Review submitted and approved", HttpStatus.ACCEPTED);
+            } else {
+                return new ResponseEntity<>(result.getMessage(), HttpStatus.BAD_REQUEST);
+            }
         } catch (UsernameNotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
