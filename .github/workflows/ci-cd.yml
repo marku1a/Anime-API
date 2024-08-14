@@ -21,13 +21,14 @@ jobs:
     - name: Build with Maven
       env:
         MONGODB_DATABASE_TEST: ${{ secrets.MONGODB_DATABASE_TEST }}
+        MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
         MONGODB_USER: ${{ secrets.MONGODB_USER }}
         MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
         MONGODB_CLUSTER: ${{ secrets.MONGODB_CLUSTER }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
         G_API_KEY: ${{ secrets.G_API_KEY }}
-      run: mvn clean package
+      run: mvn clean package -Dspring.profiles.active=test
 
     - name: Setup Google Cloud CLI
       uses: google-github-actions/setup-gcloud@v0.2.0
@@ -47,6 +48,7 @@ jobs:
 
     - name: Deploy to Cloud Run
       env:
+        MONGODB_DATABASE_TEST: ${{ secrets.MONGODB_DATABASE_TEST }}
         MONGODB_DATABASE: ${{ secrets.MONGODB_DATABASE }}
         MONGODB_USER: ${{ secrets.MONGODB_USER }}
         MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
