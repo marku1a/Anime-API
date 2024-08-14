@@ -1,8 +1,11 @@
 package com.marko.anime.services;
 
+import com.marko.anime.dtos.ReviewStatus;
+import com.marko.anime.dtos.ReviewSubmissionResult;
 import com.marko.anime.models.Anime;
 import com.marko.anime.models.Review;
 import com.marko.anime.models.User;
+import com.marko.anime.repositories.AnimeRepository;
 import com.marko.anime.repositories.ReviewRepository;
 import com.marko.anime.repositories.UserRepository;
 import com.mongodb.client.result.UpdateResult;
@@ -12,19 +15,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.mongodb.core.ExecutableUpdateOperation.ExecutableUpdate;
 import org.springframework.data.mongodb.core.ExecutableUpdateOperation.TerminatingUpdate;
 import org.springframework.data.mongodb.core.ExecutableUpdateOperation.UpdateWithUpdate;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Update;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -35,10 +37,16 @@ class ReviewServiceTest {
     private ReviewRepository reviewRepository;
 
     @Mock
+    private AnimeRepository animeRepository;
+
+    @Mock
     private MongoTemplate mongoTemplate;
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ProfanityFilterService profanityFilterService;
 
     @InjectMocks
     private ReviewService reviewService;
@@ -48,10 +56,11 @@ class ReviewServiceTest {
     private String userId;
     private User user;
     private Review review;
+    private Anime anime;
 
     @BeforeEach
     void init() {
-        body = "Awesome anime!";
+        body = "This anime is awesome!";
         imdbId = "tt1234567";
         userId = "user123";
         user = new User();
@@ -60,9 +69,13 @@ class ReviewServiceTest {
     }
 
     @Test
-    void giveReview_ShouldReturnReview_WhenSuccessful() {
+    void submitReview_ShouldReturnApproved_WhenSuccessful() {
         when(userRepository.findByUserId(userId)).thenReturn(Optional.of(user));
-        when(reviewRepository.insert(any(Review.class))).thenReturn(review);
+        Anime anime = new Anime();
+        anime.setReviewIds(new ArrayList<>());
+        when(animeRepository.findAnimeByImdbId(imdbId)).thenReturn(Optional.of(anime));
+        when(profanityFilterService.hasProfanity(body)).thenReturn(false);
+        when(reviewRepository.save(any(Review.class))).thenReturn(review);
 
         ExecutableUpdate executableUpdate = mock(ExecutableUpdate.class);
         TerminatingUpdate terminatingUpdate = mock(TerminatingUpdate.class);
@@ -73,44 +86,57 @@ class ReviewServiceTest {
         when(updateWithUpdate.apply(any(Update.class))).thenReturn(terminatingUpdate);
         when(terminatingUpdate.first()).thenReturn(UpdateResult.acknowledged(1, 1L, null));
 
+        ReviewSubmissionResult result = reviewService.submitReview(body, imdbId, userId);
 
-        Review createdReview = reviewService.giveReview(body, imdbId, userId);
-
-        assertThat(createdReview).isNotNull();
-        assertThat(createdReview.getBody()).isEqualTo(body);
-        assertThat(createdReview.getUserId()).isEqualTo(userId);
+        assertThat(result.getStatus()).isEqualTo(ReviewStatus.APPROVED);
+        assertThat(result.getMessage()).isEqualTo("Review published!");
 
         verify(userRepository, times(1)).findByUserId(userId);
-        verify(reviewRepository, times(1)).insert(any(Review.class));
+        verify(reviewRepository, times(1)).save(any(Review.class));
         verify(mongoTemplate, times(1)).update(Anime.class);
         verify(executableUpdate, times(1)).matching(any(Criteria.class));
         verify(updateWithUpdate, times(1)).apply(any(Update.class));
         verify(terminatingUpdate, times(1)).first();
     }
-
     @Test
-    void giveReview_ShouldThrowException_WhenUserNotFound() {
+    void submitReview_ShouldReturnError_WhenUserNotFound() {
         when(userRepository.findByUserId(userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> reviewService.giveReview(body, imdbId, userId))
-                .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessage("User not found");
+        ReviewSubmissionResult result = reviewService.submitReview(body, imdbId, userId);
 
-        verify(reviewRepository, never()).insert(any(Review.class));
-        verify(mongoTemplate, never()).update(Anime.class);
+        assertThat(result.getStatus()).isEqualTo(ReviewStatus.ERROR);
+        assertThat(result.getMessage()).isEqualTo("Error processing review: User not found");
     }
-
     @Test
-    void giveReview_ShouldThrowException_WhenDatabaseErrorOccurs() {
+    void submitReview_ShouldReturnRejected_WhenReviewTooShort() {
         when(userRepository.findByUserId(userId)).thenReturn(Optional.of(user));
-        doThrow(new DataAccessException("Database error") {}).when(reviewRepository).insert(any(Review.class));
 
-        assertThatThrownBy(() -> reviewService.giveReview(body, imdbId, userId))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Database error occured while giving review.");
+        ReviewSubmissionResult result = reviewService.submitReview("Short review", imdbId, userId);
 
-        verify(reviewRepository, times(1)).insert(any(Review.class));
-        verify(mongoTemplate, never()).update(Anime.class);
+        assertThat(result.getStatus()).isEqualTo(ReviewStatus.REJECTED);
+        assertThat(result.getMessage()).isEqualTo("Review must have at least 15 characters!");
     }
+    @Test
+    void submitReview_ShouldReturnRejected_WhenReviewAlreadyExists() {
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(user));
+        Anime anime = new Anime();
+        anime.setReviewIds(List.of(review));
+        when(animeRepository.findAnimeByImdbId(imdbId)).thenReturn(Optional.of(anime));
+        when(reviewRepository.getById(any())).thenReturn(Optional.of(review));
 
+        ReviewSubmissionResult result = reviewService.submitReview(body, imdbId, userId);
+
+        assertThat(result.getStatus()).isEqualTo(ReviewStatus.REJECTED);
+        assertThat(result.getMessage()).isEqualTo("Review for this anime has already been posted by user.");
+    }
+    @Test
+    void submitReview_ShouldReturnRejected_WhenReviewHasProfanity() {
+        when(userRepository.findByUserId(userId)).thenReturn(Optional.of(user));
+        when(profanityFilterService.hasProfanity(body)).thenReturn(true);
+
+        ReviewSubmissionResult result = reviewService.submitReview(body, imdbId, userId);
+
+        assertThat(result.getStatus()).isEqualTo(ReviewStatus.REJECTED);
+        assertThat(result.getMessage()).isEqualTo("Review rejected due to profanity!");
+    }
 }

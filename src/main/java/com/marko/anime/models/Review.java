@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Document(collection = "reviews")
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Review implements Serializable {
+public class Review {
     private ObjectId id;
     private String body;
     private String userId; //"username"

@@ -172,7 +172,7 @@ public class AuthenticationService {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .sameSite("Strict")
+                .sameSite("None")
                 .maxAge(Duration.ofMillis(refreshExp))
                 .build();
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());

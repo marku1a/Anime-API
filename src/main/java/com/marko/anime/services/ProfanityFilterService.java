@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -21,6 +22,9 @@ public class ProfanityFilterService {
     private String API_KEY;
     private static final String PERSPECTIVE_API_URL = "https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=";
     private final RestTemplate restTemplate;
+
+    private static final double PROFANITY_LIMIT = 0.5;
+    private static final double TOXICITY_LIMIT = 0.5;
 
     public ProfanityFilterService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
@@ -45,20 +49,20 @@ public class ProfanityFilterService {
 
             if (responseBody != null && responseBody.containsKey("attributeScores")) {
                 Map<String, Object> attributeScores = (Map<String, Object>) responseBody.get("attributeScores");
+
                 Map<String, Object> profanity = (Map<String, Object>) attributeScores.get("PROFANITY");
                 Map<String, Object> toxicity = (Map<String, Object>) attributeScores.get("TOXICITY");
+
                 Map<String, Object> profanityScore = (Map<String, Object>) profanity.get("summaryScore");
                 Map<String, Object> toxicityScore = (Map<String, Object>) toxicity.get("summaryScore");
+
                 double profanitySummaryScore = (double) profanityScore.get("value");
                 double toxicitySummaryScore = (double) toxicityScore.get("value");
 
-                // adjust score for profanity/toxicity
-                if (profanitySummaryScore > 0.5 || toxicitySummaryScore > 0.5 ) {
-                    return true;
-                }
+                return profanitySummaryScore > PROFANITY_LIMIT || toxicitySummaryScore > TOXICITY_LIMIT;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RestClientException e) {
+            throw new RestClientException("Error calling Perspective API: " + e.getMessage());
         }
         return false;
     }

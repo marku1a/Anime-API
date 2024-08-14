@@ -9,7 +9,6 @@ import com.marko.anime.repositories.ReviewRepository;
 import com.marko.anime.services.ReviewService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,20 +32,15 @@ public class ReviewController {
         this.reviewRepository = reviewRepository;
     }
     @PostMapping
-    public ResponseEntity<?> createReview(@RequestBody Map<String, String> payload) {
-        try {
-            ReviewSubmissionResult result = reviewService.submitReview(payload.get("reviewBody"), payload.get("imdbId"), payload.get("userId"));
-            if ((result.getStatus()).equals(ReviewStatus.APPROVED)) {
-                return new ResponseEntity<>("Review submitted and approved", HttpStatus.ACCEPTED);
-            } else {
-                return new ResponseEntity<>(result.getMessage(), HttpStatus.BAD_REQUEST);
-            }
-        } catch (UsernameNotFoundException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<String> createReview(@RequestBody Map<String, String> payload) {
+        ReviewSubmissionResult result = reviewService.submitReview(payload.get("reviewBody"), payload.get("imdbId"), payload.get("userId"));
+
+        if (result.getStatus().equals(ReviewStatus.APPROVED)) {
+            return ResponseEntity.accepted().body(result.getMessage());
+        } else if (result.getStatus().equals(ReviewStatus.REJECTED)) {
+            return ResponseEntity.badRequest().body(result.getMessage());
+        } else { //ReviewStatus.ERROR
+            return ResponseEntity.internalServerError().body(result.getMessage());
         }
     }
    @GetMapping("/{imdbId}")

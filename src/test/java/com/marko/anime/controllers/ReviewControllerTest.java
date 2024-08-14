@@ -1,7 +1,10 @@
 package com.marko.anime.controllers;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marko.anime.configuration.TestSecurityConfig;
+import com.marko.anime.dtos.ReviewStatus;
+import com.marko.anime.dtos.ReviewSubmissionResult;
 import com.marko.anime.models.Anime;
 import com.marko.anime.models.Review;
 import com.marko.anime.repositories.AnimeRepository;
@@ -18,9 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.dao.DataAccessException;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -85,71 +86,62 @@ class ReviewControllerTest {
                 .reviewIds(List.of(review))
                 .build();
     }
-
     @Test
     @WithMockUser
-    void createReview_shouldReturnCreated_whenSuccessful() throws Exception {
+    void createReview_shouldReturnAccepted_whenApproved() throws Exception {
         Map<String, String> payload = Map.of(
                 "reviewBody", review.getBody(),
                 "imdbId", anime.getImdbId(),
                 "userId", review.getUserId()
         );
 
-        when(reviewService.giveReview(review.getBody(), anime.getImdbId(), review.getUserId())).thenReturn(review);
+        ReviewSubmissionResult result = new ReviewSubmissionResult(ReviewStatus.APPROVED, "Review published!");
+
+        when(reviewService.submitReview(review.getBody(), anime.getImdbId(), review.getUserId())).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/anime-reviews")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(review)));
+                .andExpect(status().isAccepted())
+                .andExpect(content().string(result.getMessage()));
 
-        verify(reviewService, times(1)).giveReview(review.getBody(), anime.getImdbId(),
-                review.getUserId());
+        verify(reviewService, times(1)).submitReview(review.getBody(), anime.getImdbId(), review.getUserId());
     }
 
     @Test
     @WithMockUser
-    void createReview_shouldReturnNotFound_whenUserIdNotFound() throws Exception {
+    void createReview_shouldReturnBadRequest_whenRejected() throws Exception {
         Map<String, String> payload = Map.of(
                 "reviewBody", review.getBody(),
                 "imdbId", anime.getImdbId(),
                 "userId", review.getUserId()
         );
-        when(reviewService.giveReview(review.getBody(), anime.getImdbId(), review.getUserId())).thenThrow(
-                new UsernameNotFoundException("User not found"));
+
+        ReviewSubmissionResult result = new ReviewSubmissionResult(ReviewStatus.REJECTED, "Review rejected due to profanity!");
+
+        when(reviewService.submitReview(review.getBody(), anime.getImdbId(), review.getUserId())).thenReturn(result);
 
         mockMvc.perform(post("/api/v1/anime-reviews")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("User not found"));
-        verify(reviewService, times(1)).giveReview(review.getBody(), anime.getImdbId(), review.getUserId());
-        verify(reviewRepository, times(0)).save(review);
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(result.getMessage()));
+
+        verify(reviewService, times(1)).submitReview(review.getBody(), anime.getImdbId(), review.getUserId());
     }
 
     @Test
     @WithMockUser
-    void createReview_shouldReturnInternalServerError_whenDataAccessExceptionOccurs() throws Exception {
-        Map<String, String> payload = Map.of(
-                "reviewBody", review.getBody(),
-                "imdbId", anime.getImdbId(),
-                "userId", review.getUserId()
-        );
-
-        when(reviewService.giveReview(review.getBody(), anime.getImdbId(), review.getUserId()))
-                .thenThrow(new RuntimeException("Database error occured while giving review.",
-                        new DataAccessException("Test DataAccessException") {}));
+    void createReview_shouldReturnInternalServerError_whenErrorOccurs() throws Exception {
+        ReviewSubmissionResult errorResult = new ReviewSubmissionResult(ReviewStatus.ERROR, "Error processing review: Some error");
+        when(reviewService.submitReview(anyString(), anyString(), anyString())).thenReturn(errorResult);
 
         mockMvc.perform(post("/api/v1/anime-reviews")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(payload)))
+                        .content("{ \"reviewBody\": \"Great anime!\", \"imdbId\": \"tt1234567\", \"userId\": \"user123\" }"))
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().string("Database error occured while giving review."));
-
-        verify(reviewService, times(1)).giveReview(review.getBody(), anime.getImdbId(), review.getUserId());
-        verifyNoInteractions(reviewRepository);
+                .andExpect(content().string("Error processing review: Some error"));
     }
-
     @Test
     @WithMockUser
     void getAnimeReviews_shouldReturnStatusOk_whenSuccessful() throws Exception {
@@ -193,3 +185,4 @@ class ReviewControllerTest {
 
 
 }
+

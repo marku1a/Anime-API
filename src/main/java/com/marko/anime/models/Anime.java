@@ -28,4 +28,5 @@ public class Anime {
     private List<String> backdrops;
     @DocumentReference
     private List<Review> reviewIds;
+
 }
