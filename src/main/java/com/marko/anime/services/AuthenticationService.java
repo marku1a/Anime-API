@@ -177,6 +177,12 @@ public class AuthenticationService {
                 !StringUtils.hasText(request.getUserId())) {
             throw new IllegalArgumentException("Missing required fields.");
         }
+        if (userRepository.findByEmail(request.getEmail().trim().toLowerCase()).isPresent()) {
+            throw new EmailAlreadyInUseException("This e-mail is already in use!");
+        }
+        if (userRepository.findByUserIdIgnoreCase(request.getUserId().trim().toLowerCase()).isPresent()) {
+            throw new UserIdAlreadyInUseException("This username is already in use!");
+        }
         if (!request.getFirstName().matches("^[a-zA-Z]+$")) {
             throw new IllegalArgumentException("First name must contain only letters.");
         }
@@ -192,11 +198,6 @@ public class AuthenticationService {
         if (!request.getPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d|.*[!@#$%^&*()_+{}:\"<>?\\[\\];',./`~\\\\|-]).{6,}$")) {
             throw new IllegalArgumentException("Password must contain at least 6 characters, one uppercase letter, one lowercase letter, and one number or special character.");
         }
-        if (userRepository.findByEmail(request.getEmail().trim().toLowerCase()).isPresent()) {
-            throw new EmailAlreadyInUseException("This e-mail is already in use!");
-        }
-        if (userRepository.findByUserIdIgnoreCase(request.getUserId().trim().toLowerCase()).isPresent()) {
-            throw new UserIdAlreadyInUseException("This username is already in use!");
-        }
+
     }
 }

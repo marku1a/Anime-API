@@ -24,7 +24,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
@@ -67,7 +66,7 @@ class AuthenticationServiceTest {
                 .lastName("Wick")
                 .email("john.wick@mail.com")
                 .userId("john_W")
-                .password("password")
+                .password("Password1")
                 .role("ROLE_USER")
                 .build();
     }
@@ -112,7 +111,7 @@ class AuthenticationServiceTest {
                 .lastName("Wick")
                 .email("john.wick@mail.com")
                 .userId("john_W")
-                .password("password")
+                .password("Password1")
                 .role("ROLE_USER")
                 .accountNonLocked(true)
                 .build();
@@ -131,14 +130,13 @@ class AuthenticationServiceTest {
     void authenticate_shouldThrowException_whenEmailNotFound() {
         AuthenticationRequest request = AuthenticationRequest.builder()
                 .email("john.wick@mail.com")
-                .password("password")
+                .password("Password")
                 .build();
 
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> authenticationService.authenticate(request))
-                .isInstanceOf(UsernameNotFoundException.class)
-                .hasMessageContaining("Email not found!");
+                .isInstanceOf(BadCredentialsException.class);
     }
     @Test
     void authenticate_shouldThrowException_whenWrongPassword() {
