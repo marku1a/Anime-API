@@ -60,7 +60,7 @@ class ReviewServiceTest {
 
     @BeforeEach
     void init() {
-        body = "This anime is awesome!";
+        body = "This anime is awesome! I really enjoyed it! Recommended!";
         imdbId = "tt1234567";
         userId = "user123";
         user = new User();
@@ -105,7 +105,7 @@ class ReviewServiceTest {
         ReviewSubmissionResult result = reviewService.submitReview(body, imdbId, userId);
 
         assertThat(result.getStatus()).isEqualTo(ReviewStatus.ERROR);
-        assertThat(result.getMessage()).isEqualTo("Error processing review: User not found");
+        assertThat(result.getMessage()).isEqualTo("Error processing review: User not found.");
     }
     @Test
     void submitReview_ShouldReturnRejected_WhenReviewTooShort() {
@@ -114,7 +114,7 @@ class ReviewServiceTest {
         ReviewSubmissionResult result = reviewService.submitReview("Short review", imdbId, userId);
 
         assertThat(result.getStatus()).isEqualTo(ReviewStatus.REJECTED);
-        assertThat(result.getMessage()).isEqualTo("Review must have at least 15 characters!");
+        assertThat(result.getMessage()).isEqualTo("Review must have at least 50 characters!");
     }
     @Test
     void submitReview_ShouldReturnRejected_WhenReviewAlreadyExists() {

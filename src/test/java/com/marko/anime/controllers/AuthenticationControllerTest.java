@@ -5,6 +5,8 @@ import com.marko.anime.configuration.TestSecurityConfig;
 import com.marko.anime.dtos.AuthenticationRequest;
 import com.marko.anime.dtos.AuthenticationResponse;
 import com.marko.anime.dtos.RegisterRequest;
+import com.marko.anime.exceptions.EmailAlreadyInUseException;
+import com.marko.anime.exceptions.ErrorResponse;
 import com.marko.anime.repositories.TokenRepository;
 import com.marko.anime.services.AuthenticationService;
 import com.marko.anime.services.JwtService;
@@ -50,6 +52,7 @@ class AuthenticationControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+
     @Test
     void register_shouldReturnStatusOk_whenSuccessful() throws Exception {
         RegisterRequest registerRequest = RegisterRequest.builder()
@@ -90,15 +93,18 @@ class AuthenticationControllerTest {
                 .role("ROLE_USER")
                 .build();
 
-        String errorMessage = "Registration failed: Email already exists";
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(400)
+                .message("This e-mail is already in use!")
+                .build();
 
-        when(authService.register(any(RegisterRequest.class))).thenThrow(new IllegalArgumentException(errorMessage));
+        when(authService.register(any(RegisterRequest.class))).thenThrow(new EmailAlreadyInUseException("This e-mail is already in use!"));
 
         mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Registration failed: " + errorMessage));
+                .andExpect(content().json(objectMapper.writeValueAsString(errorResponse)));
 
         verify(authService).register(any(RegisterRequest.class));
     }
@@ -131,19 +137,23 @@ class AuthenticationControllerTest {
     }
 
     @Test
-    void authenticate_shouldBeBadRequest_whenBadCredentials() throws Exception {
+    void authenticate_shouldBeForbidden_whenBadCredentials() throws Exception {
         AuthenticationRequest authRequest = AuthenticationRequest.builder()
                 .email("johnW@continental.com")
                 .password("wrongpassword")
                 .build();
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(403)
+                .message("Login failed: Check your email and password and try again.")
+                .build();
 
-        when(authService.authenticate(any(AuthenticationRequest.class))).thenThrow(new BadCredentialsException("Invalid credentials"));
+        when(authService.authenticate(any(AuthenticationRequest.class))).thenThrow(new BadCredentialsException(""));
 
         mockMvc.perform(post("/api/v1/auth/authenticate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(authRequest)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Login failed: Check your email and password and try again! "));
+                .andExpect(status().isForbidden())
+                .andExpect(content().json(objectMapper.writeValueAsString(errorResponse)));
 
         verify(authService).authenticate(any(AuthenticationRequest.class));
     }
@@ -154,14 +164,18 @@ class AuthenticationControllerTest {
                 .email("banned@continental.com")
                 .password("password123")
                 .build();
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(403)
+                .message("This account is banned!")
+                .build();
 
-        when(authService.authenticate(any(AuthenticationRequest.class))).thenThrow(new LockedException("Account is locked"));
+        when(authService.authenticate(any(AuthenticationRequest.class))).thenThrow(new LockedException("This account is banned!"));
 
         mockMvc.perform(post("/api/v1/auth/authenticate")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(authRequest)))
                 .andExpect(status().isForbidden())
-                .andExpect(content().string("This account is banned."));
+                .andExpect(content().json(objectMapper.writeValueAsString(errorResponse)));
 
         verify(authService).authenticate(any(AuthenticationRequest.class));
     }

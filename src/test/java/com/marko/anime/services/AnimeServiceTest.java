@@ -1,5 +1,6 @@
 package com.marko.anime.services;
 
+import com.marko.anime.exceptions.AnimeNotFoundException;
 import com.marko.anime.models.Anime;
 import com.marko.anime.repositories.AnimeRepository;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.List;
@@ -40,7 +40,7 @@ public class AnimeServiceTest {
     void findAllAnime_shouldThrowException_whenDatabaseError() {
         when(animeRepository.findAll()).thenThrow(new DataAccessException("Database error") {});
 
-        assertThrows(ResponseStatusException.class, () -> animeService.findAllAnime());
+        assertThrows(DataAccessException.class, () -> animeService.findAllAnime());
 
         verify(animeRepository, times(1)).findAll();
     }
@@ -63,7 +63,7 @@ public class AnimeServiceTest {
         String imdbId = "tt1234567";
         when(animeRepository.findAnimeByImdbId(imdbId)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> animeService.findAnimeByImdbId(imdbId));
+        assertThrows(AnimeNotFoundException.class, () -> animeService.findAnimeByImdbId(imdbId));
 
         verify(animeRepository, times(1)).findAnimeByImdbId(imdbId);
     }
@@ -84,7 +84,7 @@ public class AnimeServiceTest {
         Anime anime = Anime.builder().build();
         when(animeRepository.save(anime)).thenThrow(new DataAccessException("Database error") {});
 
-        assertThrows(ResponseStatusException.class, () -> animeService.createNewAnime(anime));
+        assertThrows(DataAccessException.class, () -> animeService.createNewAnime(anime));
 
         verify(animeRepository, times(1)).save(anime);
     }
@@ -110,7 +110,7 @@ public class AnimeServiceTest {
         Anime anime = Anime.builder().imdbId(imdbId).build();
         when(animeRepository.findAnimeByImdbId(imdbId)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> animeService.updateAnime(imdbId, anime));
+        assertThrows(AnimeNotFoundException.class, () -> animeService.updateAnime(imdbId, anime));
         verify(animeRepository, times(1)).findAnimeByImdbId(imdbId);
     }
 
@@ -130,7 +130,7 @@ public class AnimeServiceTest {
         String imdbId = "tt1234567";
         when(animeRepository.deleteAnimeByImdbId(imdbId)).thenReturn(Optional.empty());
 
-        assertThrows(ResponseStatusException.class, () -> animeService.deleteAnime(imdbId));
+        assertThrows(AnimeNotFoundException.class, () -> animeService.deleteAnime(imdbId));
         verify(animeRepository, times(1)).deleteAnimeByImdbId(imdbId);
     }
 
@@ -140,7 +140,7 @@ public class AnimeServiceTest {
         when(animeRepository.deleteAnimeByImdbId(imdbId)).thenThrow(new DataAccessException("Database error") {
         });
 
-        assertThrows(ResponseStatusException.class, () -> animeService.deleteAnime(imdbId));
+        assertThrows(DataAccessException.class, () -> animeService.deleteAnime(imdbId));
         verify(animeRepository, times(1)).deleteAnimeByImdbId(imdbId);
     }
 }

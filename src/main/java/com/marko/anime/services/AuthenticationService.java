@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marko.anime.dtos.AuthenticationRequest;
 import com.marko.anime.dtos.AuthenticationResponse;
 import com.marko.anime.dtos.RegisterRequest;
+import com.marko.anime.exceptions.EmailAlreadyInUseException;
+import com.marko.anime.exceptions.RefreshTokenInProgressException;
+import com.marko.anime.exceptions.UserIdAlreadyInUseException;
 import com.marko.anime.models.Role;
 import com.marko.anime.models.Token;
 import com.marko.anime.models.TokenType;
@@ -22,6 +25,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -42,16 +46,7 @@ public class AuthenticationService {
 
 
     public AuthenticationResponse register(RegisterRequest request) {
-            if (request.getFirstName().isEmpty() || request.getLastName().isEmpty() ||
-                    request.getEmail().isEmpty() || request.getPassword().isEmpty()) {
-                throw new IllegalArgumentException("Missing required fields");
-            }
-            if (userRepository.findByEmail(request.getEmail().trim().toLowerCase()).isPresent()) {
-                throw new IllegalArgumentException("This e-mail is already in use!");
-            }
-            if (userRepository.findByUserIdIgnoreCase(request.getUserId().trim().toLowerCase()).isPresent()) {
-                throw new IllegalArgumentException("This username is already in use!");
-            }
+            validateRegistrationRequest(request);
             var user = User.builder()
                     .firstName(request.getFirstName())
                     .lastName(request.getLastName())
@@ -63,19 +58,18 @@ public class AuthenticationService {
                     .build();
             var savedUser = userRepository.save(user);
             return AuthenticationResponse.builder()
+                    .userId(savedUser.getUserId())
                     .build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
             var user = userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new UsernameNotFoundException("Email not found!"));
-            try {
+                    .orElseThrow(() -> new BadCredentialsException(""));
+
                 authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
                 );
-            } catch (BadCredentialsException e) {
-                throw new BadCredentialsException("Bad credentials!");
-            }
+
             var jwtToken = jwtService.generateToken(user);
             var refreshToken = jwtService.generateRefreshToken(user);
             revokeAllUserTokens(user);
@@ -119,14 +113,12 @@ public class AuthenticationService {
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final String refreshToken = extractRefreshToken(request);
         if (refreshToken == null ){
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Refresh token not found");
-            return;
+            throw new IllegalArgumentException("Refresh token not found");
         }
         final String userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
             if (!refreshTokenInProgress.add(userEmail)) {
-                response.sendError(HttpServletResponse.SC_CONFLICT, "Refresh token operation in progress");
-                return;
+                throw new RefreshTokenInProgressException("Refresh token operation in progress");
             }
             try {
                 var user = this.userRepository.findByEmail(userEmail)
@@ -176,5 +168,35 @@ public class AuthenticationService {
                 .maxAge(Duration.ofMillis(refreshExp))
                 .build();
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    }
+    void validateRegistrationRequest(RegisterRequest request) {
+        if (!StringUtils.hasText(request.getFirstName()) ||
+                !StringUtils.hasText(request.getLastName()) ||
+                !StringUtils.hasText(request.getEmail()) ||
+                !StringUtils.hasText(request.getPassword()) ||
+                !StringUtils.hasText(request.getUserId())) {
+            throw new IllegalArgumentException("Missing required fields.");
+        }
+        if (!request.getFirstName().matches("^[a-zA-Z]+$")) {
+            throw new IllegalArgumentException("First name must contain only letters.");
+        }
+        if (!request.getLastName().matches("^[a-zA-Z]+$")) {
+            throw new IllegalArgumentException("Last name must contain only letters.");
+        }
+        if (!request.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            throw new IllegalArgumentException("Invalid email format.");
+        }
+        if (!request.getUserId().matches("^[a-zA-Z0-9_]+$")) {
+            throw new IllegalArgumentException("Username must contain only letters, numbers, and underscores.");
+        }
+        if (!request.getPassword().matches("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d|.*[!@#$%^&*()_+{}:\"<>?\\[\\];',./`~\\\\|-]).{6,}$")) {
+            throw new IllegalArgumentException("Password must contain at least 6 characters, one uppercase letter, one lowercase letter, and one number or special character.");
+        }
+        if (userRepository.findByEmail(request.getEmail().trim().toLowerCase()).isPresent()) {
+            throw new EmailAlreadyInUseException("This e-mail is already in use!");
+        }
+        if (userRepository.findByUserIdIgnoreCase(request.getUserId().trim().toLowerCase()).isPresent()) {
+            throw new UserIdAlreadyInUseException("This username is already in use!");
+        }
     }
 }

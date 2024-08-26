@@ -45,7 +45,6 @@ public class ReviewController {
     }
    @GetMapping("/{imdbId}")
     public ResponseEntity<List<Review>> getAnimeReviews(@PathVariable String imdbId) {
-        try {
             Optional<Anime> animeOpt = animeRepository.findAnimeByImdbId(imdbId);
             if(animeOpt.isPresent()) {
                 List<Review> reviews = animeOpt.get().getReviewIds().stream()
@@ -56,8 +55,5 @@ public class ReviewController {
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
    }
 }

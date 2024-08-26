@@ -38,10 +38,10 @@ public class ReviewService {
     public ReviewSubmissionResult submitReview(String body, String imdbId, String userId) {
         try {
             User user = userRepository.findByUserId(userId)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            if (body.length() < 15) {
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found."));
+            if (body.length() < 50) {
                 return new ReviewSubmissionResult(ReviewStatus.REJECTED,
-                        "Review must have at least 15 characters!");
+                        "Review must have at least 50 characters!");
             }
             if (reviewByUserExists(imdbId, userId)) {
                 return new ReviewSubmissionResult(ReviewStatus.REJECTED,

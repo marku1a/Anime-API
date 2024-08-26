@@ -3,6 +3,8 @@ package com.marko.anime.services;
 import com.marko.anime.dtos.AuthenticationRequest;
 import com.marko.anime.dtos.AuthenticationResponse;
 import com.marko.anime.dtos.RegisterRequest;
+import com.marko.anime.exceptions.EmailAlreadyInUseException;
+import com.marko.anime.exceptions.UserIdAlreadyInUseException;
 import com.marko.anime.models.Token;
 import com.marko.anime.models.TokenType;
 import com.marko.anime.models.User;
@@ -92,7 +94,7 @@ class AuthenticationServiceTest {
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(new User()));
 
         assertThatThrownBy(() -> authenticationService.register(validRegisterRequest))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(EmailAlreadyInUseException.class)
                 .hasMessageContaining("This e-mail is already in use!");
     }
     @Test
@@ -100,7 +102,7 @@ class AuthenticationServiceTest {
         when(userRepository.findByUserIdIgnoreCase(anyString())).thenReturn(Optional.of(new User()));
 
         assertThatThrownBy(() -> authenticationService.register(validRegisterRequest))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(UserIdAlreadyInUseException.class)
                 .hasMessageContaining("This username is already in use!");
     }
     @Test
