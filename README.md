@@ -15,7 +15,7 @@ This is backend for my [Bingeworthy.anime](https://github.com/marku1a/Bingeworth
 ![1](https://github.com/marku1a/Bingeworthy.anime/assets/122821687/5359d3ca-c3c2-4178-9d40-b9a90e1374cb)
 ![3](https://github.com/marku1a/Bingeworthy.anime/assets/122821687/e0fa1e47-001b-4b67-86d7-c0b0f71c3340)
 ![4](https://github.com/marku1a/Bingeworthy.anime/assets/122821687/9b2572e5-e779-4bf2-af33-e3bbf599bf1c)
-![5](https://github.com/marku1a/Bingeworthy.anime/assets/122821687/139f7923-f908-4cb7-b7ca-b077c63e3bc9)
+![5](https://github.com/marku1a/Bingeworthy.anime/assets/122821687/139f7923-f908-4cb7-b7ca-b077c63e3bc9) 
 ![6](https://github.com/marku1a/Bingeworthy.anime/assets/122821687/6873e58c-9e71-46f7-96fa-4da77c8d9274)
 
 
