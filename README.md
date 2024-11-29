@@ -60,4 +60,4 @@ To run the project locally, follow these steps:
 - **GET /api/v1/anime-reviews/{imdbId}**: Retrieve reviews for a specific anime.
 
 - **GET /api/v1/users**: Retrive all users.
-- **PUT /api/v1/users/{userId}/ban**: For locking(banning) user accounts.
+- **PUT /api/v1/users/{userId}/ban**: For locking(banning) user accounts. 
