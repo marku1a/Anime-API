@@ -22,7 +22,7 @@ This is backend for my [Bingeworthy.anime](https://github.com/marku1a/Bingeworth
 ## Technologies Used
 - **Spring Boot**: For creating RESTful APIs and handling backend logic.
 - **MongoDB**: As the database for storing anime information and user reviews.
-- **Spring Security**: For authentication and authorization.
+- **Spring Security**: For authentication and authorization. 
 - **JSON Web Tokens (JWT)**: Used for secure communication between the client and the server.
 - **Perspective API (by Jigsaw, Google)**: For filtering reviews for profanity/toxicity before posting.
 - **Github Actions**: CI/CD for automated testing, building, and deployment of the application.
